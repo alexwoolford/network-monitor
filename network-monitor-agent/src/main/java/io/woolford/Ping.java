@@ -2,6 +2,8 @@ package io.woolford;
 
 
 import com.google.common.base.Stopwatch;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -17,6 +19,9 @@ import java.util.logging.Logger;
 public class Ping {
 
     static Logger logger = Logger.getLogger(Ping.class.getName());
+
+    @Autowired
+    private KafkaTemplate<Integer, String> template;
 
     @Scheduled(fixedRate = 1000L)
     private void pingTest(){
@@ -51,6 +56,8 @@ public class Ping {
 
             PingRecordAvro pingRecordAvro = getPingRecordAvro(pingRecord);
 
+            template.send("ping", pingRecordAvro.toString());
+
             logger.info(pingRecordAvro.toString());
 
 
@@ -61,6 +68,8 @@ public class Ping {
 
 
     private PingRecordAvro getPingRecordAvro(PingRecord pingRecord){
+
+        // https://github.com/FasterXML/jackson-dataformats-binary/tree/master/avro
 
         PingRecordAvro pingRecordAvro = new PingRecordAvro();
 
