@@ -1,3 +1,4 @@
 /target
 .idea/
 network-monitor-agent/.mvn/
+network-monitor-agent/target/
