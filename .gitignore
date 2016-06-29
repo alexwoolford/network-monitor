@@ -2,3 +2,5 @@
 .idea/
 network-monitor-agent/.mvn/
 network-monitor-agent/target/
+network-monitor-influx/target/
+*.iml

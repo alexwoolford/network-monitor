@@ -2,6 +2,10 @@ package io.woolford;
 
 
 import com.google.common.base.Stopwatch;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericData;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.reflect.ReflectData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -14,6 +18,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+
+import static javafx.scene.input.KeyCode.T;
 
 @Component
 public class Ping {
@@ -46,42 +52,25 @@ public class Ping {
             isReachable = remoteInetAddress.isReachable(1000);
             pingTimer.stop();
 
-            InetAddress locateInetAddress = InetAddress.getLocalHost();
+            InetAddress localInetAddress = InetAddress.getLocalHost();
 
-            pingRecord.setTimestamp(new Date());
-            pingRecord.setReachable(isReachable);
-            pingRecord.setLocalInetAddress(locateInetAddress);
-            pingRecord.setRemoteInetAddress(remoteInetAddress);
-            pingRecord.setResponseMicroseconds(pingTimer.elapsed(TimeUnit.MICROSECONDS));
+            Schema pingRecordSchema = ReflectData.get().getSchema(pingRecord.getClass());
+            GenericRecord pingRecordAvro = new GenericData.Record(pingRecordSchema);
 
-            PingRecordAvro pingRecordAvro = getPingRecordAvro(pingRecord);
+            pingRecordAvro.put("timestamp", new Date());
+            pingRecordAvro.put("isReachable", isReachable);
+            pingRecordAvro.put("localInetAddress", localInetAddress);
+            pingRecordAvro.put("remoteInetAddress", remoteInetAddress);
+            pingRecordAvro.put("responseMicroseconds", pingTimer.elapsed(TimeUnit.MICROSECONDS));
 
+            // TODO: serialize as Avro
             template.send("ping", pingRecordAvro.toString());
 
             logger.info(pingRecordAvro.toString());
-
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-
-    private PingRecordAvro getPingRecordAvro(PingRecord pingRecord){
-
-        // https://github.com/FasterXML/jackson-dataformats-binary/tree/master/avro
-
-        PingRecordAvro pingRecordAvro = new PingRecordAvro();
-
-        pingRecordAvro.setTimestamp(pingRecord.getTimestamp().getTime());
-        pingRecordAvro.setIsReachable(pingRecord.getReachable());
-        pingRecordAvro.setLocalInetAddress(pingRecord.getLocalInetAddress().toString());
-        pingRecordAvro.setRemoteInetAddress(pingRecord.getRemoteInetAddress().toString());
-        pingRecordAvro.setResponseMicroseconds(pingRecord.getResponseMicroseconds());
-
-        return pingRecordAvro;
-    }
-
-
 
 }
