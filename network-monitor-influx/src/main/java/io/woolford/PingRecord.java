@@ -5,18 +5,10 @@ import java.net.InetAddress;
 public class PingRecord {
 
     private long timestamp;
-    private Boolean isReachable;
+    private Boolean reachable;
     private InetAddress localInetAddress;
     private InetAddress remoteInetAddress;
     private Long responseMicroseconds;
-
-    public Long getResponseMicroseconds() {
-        return responseMicroseconds;
-    }
-
-    public void setResponseMicroseconds(Long responseMicroseconds) {
-        this.responseMicroseconds = responseMicroseconds;
-    }
 
     public long getTimestamp() {
         return timestamp;
@@ -27,11 +19,11 @@ public class PingRecord {
     }
 
     public Boolean getReachable() {
-        return isReachable;
+        return reachable;
     }
 
     public void setReachable(Boolean reachable) {
-        isReachable = reachable;
+        reachable = reachable;
     }
 
     public InetAddress getLocalInetAddress() {
@@ -50,11 +42,19 @@ public class PingRecord {
         this.remoteInetAddress = remoteInetAddress;
     }
 
+    public Long getResponseMicroseconds() {
+        return responseMicroseconds;
+    }
+
+    public void setResponseMicroseconds(Long responseMicroseconds) {
+        this.responseMicroseconds = responseMicroseconds;
+    }
+
     @Override
     public String toString() {
         return "PingRecord{" +
                 "timestamp=" + timestamp +
-                ", isReachable=" + isReachable +
+                ", reachable=" + reachable +
                 ", localInetAddress=" + localInetAddress +
                 ", remoteInetAddress=" + remoteInetAddress +
                 ", responseMicroseconds=" + responseMicroseconds +
